@@ -4,12 +4,16 @@ const cors = require('cors')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const User = require('./models/User.js')
+const multer = require('multer')
+const path = require('path')
+const Item = require('./models/Item.js')
 require('dotenv').config()
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.use('/uploads', express.static('uploads'))
 
 const uri = process.env.MONGO_URI
 
@@ -24,6 +28,49 @@ mongoose.connect(uri)
 app.get('/api/welcome', (req, res)=>{
     res.json({message: 'hello world!'})
 })
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Save files to the uploads folder
+    },
+    filename: (req, file, cb) => {
+        // Give the file a unique name using the current timestamp
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
+
+app.post('/api/items', upload.single('image'), async (req, res) => {
+    try {
+        // The text data comes in req.body
+        const { title, category } = req.body;
+        
+        // The uploaded file data comes in req.file
+        if (!req.file) {
+            return res.status(400).json({ message: 'Please upload an image' });
+        }
+
+        // Create the URL path (e.g., "http://localhost:5000/uploads/167890.jpg")
+        const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+
+        // Save everything to MongoDB
+        const newItem = new Item({
+            title: title,
+            category: category,
+            imageUrl: imageUrl
+        });
+
+        await newItem.save();
+
+        res.status(201).json({ 
+            message: 'Item added successfully', 
+            item: newItem 
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
 
 //registration user
 app.post('/api/register', async(req, res) => {

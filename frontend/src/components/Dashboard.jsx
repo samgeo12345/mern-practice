@@ -1,6 +1,8 @@
 import './Dashboard.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   // In a real flow, you would clear the token and return to the login screen
   const handleLogout = () => {
     console.log("Logging out...");
@@ -11,10 +13,19 @@ export default function Dashboard() {
       <div className="dashboard-container">
         
         <header className="dashboard-header">
-          <h2>System Dashboard</h2>
-          <button className="neon-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <h2>System Directory</h2>
+          
+          <div style={{ display: 'flex', gap: '10px' }}>
+            
+            <button className="neon-btn" onClick={() => navigate('/add-item')}>
+              + Add Item
+            </button>
+            
+            <button className="neon-btn" onClick={handleLogout} style={{ background: 'transparent', color: '#ff0055', border: '1px solid #ff0055' }}>
+              Logout
+            </button>
+            
+          </div>
         </header>
 
         <div className="dashboard-grid">
