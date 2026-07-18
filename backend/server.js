@@ -29,6 +29,17 @@ app.get('/api/welcome', (req, res)=>{
     res.json({message: 'hello world!'})
 })
 
+// --- GET ALL ITEMS ROUTE ---
+app.get('/api/items', async (req, res) => {
+    try {
+        // .find() with no arguments returns every item in the collection
+        const items = await Item.find(); 
+        res.json(items);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/'); // Save files to the uploads folder
@@ -38,6 +49,7 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + path.extname(file.originalname));
     }
 });
+
 const upload = multer({ storage: storage });
 
 app.post('/api/items', upload.single('image'), async (req, res) => {
@@ -62,10 +74,7 @@ app.post('/api/items', upload.single('image'), async (req, res) => {
 
         await newItem.save();
 
-        res.status(201).json({ 
-            message: 'Item added successfully', 
-            item: newItem 
-        });
+        res.status(201).json({ message: 'Item added successfully', item: newItem });
 
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });

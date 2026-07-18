@@ -43,6 +43,73 @@
   gap: 2rem;
 }
 
+/* --- Image Grid and Cards --- */
+
+/* This creates the Rows and Columns */
+.items-grid {
+  display: grid;
+  /* This tells it to create as many columns as possible that are at least 280px wide. 
+     If the screen gets too small, it automatically pushes cards to the next row! */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem; /* The space between your rows and columns */
+  padding-top: 1rem;
+}
+
+/* The Card styling */
+.item-card {
+  background-color: #121214; /* Slightly lighter than the background to make it pop */
+  border-radius: 12px;       /* Softer, more modern rounded corners */
+  overflow: hidden;
+  border: 1px solid #27272a;
+  display: flex;
+  flex-direction: column;    /* Stacks the image and text vertically inside the card */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Gives a floating 3D effect */
+}
+
+/* The Hover Effect */
+.item-card:hover {
+  transform: translateY(-8px); /* Card floats up slightly when you hover */
+  box-shadow: 0 10px 25px rgba(0, 238, 255, 0.15); /* Adds a subtle neon glow behind the card */
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(to right, #ff0055, #00eeff, #00ff66) 1;
+}
+
+.item-image {
+  width: 100%;
+  height: 180px; /* Taller image space */
+  object-fit: cover;
+  border-bottom: 1px solid #27272a;
+}
+
+.item-info {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1; /* Pushes the badge to the bottom if titles are different lengths */
+}
+
+.item-info h3 {
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+  color: #ffffff;
+  line-height: 1.4;
+}
+
+.item-badge {
+  align-self: flex-start; /* Keeps the badge from stretching across the whole card */
+  background-color: rgba(0, 255, 102, 0.1); /* Transparent neon background */
+  color: #00ff66;
+  padding: 6px 12px;
+  border-radius: 20px; /* Pill-shaped badge */
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(0, 255, 102, 0.3);
+}
+
 /* Internal cards with the interactive neon effect */
 .data-card {
   background-color: #09090b;

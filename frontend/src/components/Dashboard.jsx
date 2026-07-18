@@ -1,12 +1,41 @@
-import './Dashboard.css';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './Dashboard.css';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  // In a real flow, you would clear the token and return to the login screen
+  
+  // State for the search bar
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // State to hold the items from MongoDB
+  const [items, setItems] = useState([]);
+
+  // Fetch items from the backend when the dashboard loads
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/items');
+        const data = await response.json();
+        setItems(data); // Save the database items into our state
+      } catch (error) {
+        console.error('Failed to fetch items:', error);
+      }
+    };
+
+    fetchItems();
+  }, []); // Empty array ensures this only runs once on page load
+
+  // Handle logging out
   const handleLogout = () => {
-    console.log("Logging out...");
+    localStorage.removeItem('token');
+    navigate('/');
   };
+
+  // Filter the items based on what is typed in the search bar
+  const filteredItems = items.filter((item) => {
+    return item.title.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   return (
     <div className="dashboard-wrapper">
@@ -16,36 +45,48 @@ export default function Dashboard() {
           <h2>System Directory</h2>
           
           <div style={{ display: 'flex', gap: '10px' }}>
-            
             <button className="neon-btn" onClick={() => navigate('/add-item')}>
               + Add Item
             </button>
             
-            <button className="neon-btn" onClick={handleLogout} style={{ background: 'transparent', color: '#ff0055', border: '1px solid #ff0055' }}>
+            <button 
+              className="neon-btn" 
+              onClick={handleLogout} 
+              style={{ background: 'transparent', color: '#ff0055', border: '1px solid #ff0055' }}
+            >
               Logout
             </button>
-            
           </div>
         </header>
 
-        <div className="dashboard-grid">
-          
-          <div className="data-card">
-            <h3 className="card-title">Server Status</h3>
-            <p className="card-value status-online">Online</p>
-          </div>
-          
-          <div className="data-card">
-            <h3 className="card-title">Active Sessions</h3>
-            <p className="card-value">1,024</p>
-          </div>
-          
-          <div className="data-card">
-            <h3 className="card-title">Database Load</h3>
-            <p className="card-value">14%</p>
-          </div>
-
+        {/* The Search Bar */}
+        <div className="search-container">
+          <input 
+            type="text" 
+            className="neon-input search-bar" 
+            placeholder="Search directory..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
+
+        {/* Rendering the Items */}
+        <div className="items-grid">
+          {filteredItems.length > 0 ? (
+            filteredItems.map((item) => (
+              <div key={item._id} className="item-card">
+                <img src={item.imageUrl} alt={item.title} className="item-image" />
+                <div className="item-info">
+                  <h3>{item.title}</h3>
+                  <span className="item-badge">{item.category}</span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="no-results">No items found matching "{searchQuery}"</p>
+          )}
+        </div>
+
       </div>
     </div>
   );
